@@ -573,6 +573,16 @@ button {
     animation: spinner 1s infinite linear;
 }
 
+/* ERROR MESSAGE */
+
+.message-error {
+    border:1px solid red;
+    margin:25px auto;
+    padding:25px;
+    max-width: 90%;
+    border-radius: 6px;
+}
+
 
 /* MEDIA QUERIES */
 @media (max-height: 925px) {
