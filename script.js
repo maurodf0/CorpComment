@@ -1,5 +1,6 @@
 // --- GLOBAL ---
 const MAX_CHARS = 150;
+const BASE_API_URL = 'https://bytegrad.com/course-assets/js/1/api';
 
 const formEl = document.querySelector('.form');
 const textAreaEl = document.querySelector('.form__textarea');
@@ -103,15 +104,32 @@ const submitHandler = (event) => {
     //render feedback item via function
     renderFeedbackItem(feedbackItem);
 
- //clear text area
+    //send feedback item to server
+    fetch(`${BASE_API_URL}/feedbacks`, {
+        method: 'POST',
+        body: JSON.stringify(feedbackItem),
+        headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json'
+        }
+    }).then(response => {
+        if(!response.ok){
+            console.log('Something went wrong');
+            // use return for close the function and not use else in the if statement
+            return;
+        }
+            console.log('Successfly submitted');
+    }).catch(error =>  console.log(error));
+    
 
+
+ //clear text area
  textAreaEl.value = '';
 
  //blur button
  submitBtnEl.blur();
 
  // reset counter
- 
  counterEl.textContent = MAX_CHARS;
 
 }
@@ -119,8 +137,53 @@ const submitHandler = (event) => {
 formEl.addEventListener('submit', submitHandler);
 
 // --- FEEDBACK LIST COMPONENT --
+const clickHandler = (event) => {
+    //get the target of the click
+    const clickedEl = event.target;
 
-fetch('https://bytegrad.com/course-assets/js/1/api/feedbacks')
+    //determinated if user want to upvote or expand
+    const upVoteIntention = clickedEl.className.includes('upvote');
+
+    // upvote the clicked element
+    if(upVoteIntention) {
+        const upvoteBtnEl = clickedEl.closest('.upvote');
+        upvoteBtnEl.disabled = true;
+        let upVoteCountEl = upvoteBtnEl.querySelector('.upvote__count');
+        upVoteCount = +upVoteCountEl.textContent;
+        upVoteCountEl.textContent = ++upVoteCount;
+
+        /*send upvote Counter item to server
+        
+        fetch(`${BASE_API_URL}/feedbacks`, {
+        method: 'POST',
+        body: JSON.stringify(upVoteCount),
+        headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json'
+        }
+         }).then(response => {
+        if(!response.ok){
+            console.log('Something went wrong');
+            // use return for close the function and not use else in the if statement
+            return;
+        }
+            console.log('Successfly submitted');
+     }).catch(error =>  console.log(error));
+     */
+    
+
+    } else {
+        //expand the clicked feedback item
+        clickedEl.closest('.feedback').classList.toggle('feedback--expand');
+    }
+
+  
+}
+
+feedback.addEventListener('click', clickHandler);
+
+
+fetch(`${BASE_API_URL}/feedbacks`)
     .then(response => {
         return response.json();
     })
