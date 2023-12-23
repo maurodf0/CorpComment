@@ -8,6 +8,7 @@ const counterEl = document.querySelector('.counter');
 const feedback = document.querySelector('.feedbacks');
 const submitBtnEl = document.querySelector('.submit-btn');
 const spinneEl = document.querySelector('.spinner');
+const hashtagsListEl = document.querySelector('.hashtags')
 
 const renderFeedbackItem = (feedbackItem) => {
      // new html item
@@ -152,7 +153,7 @@ const clickHandler = (event) => {
         upVoteCount = +upVoteCountEl.textContent;
         upVoteCountEl.textContent = ++upVoteCount;
 
-        /*send upvote Counter item to server
+        //send upvote Counter item to server
         
         fetch(`${BASE_API_URL}/feedbacks`, {
         method: 'POST',
@@ -169,7 +170,7 @@ const clickHandler = (event) => {
         }
             console.log('Successfly submitted');
      }).catch(error =>  console.log(error));
-     */
+     
     
 
     } else {
@@ -177,7 +178,6 @@ const clickHandler = (event) => {
         clickedEl.closest('.feedback').classList.toggle('feedback--expand');
     }
 
-  
 }
 
 feedback.addEventListener('click', clickHandler);
@@ -204,4 +204,39 @@ fetch(`${BASE_API_URL}/feedbacks`)
         feedback.innerHTML = `
         <div class="message-error">Failed to fech the data. Error message: ${error.message}</div>`;
     });
+
+
+    // hashtag list component
+
+    const clickHandlerHashtags = event => {
+        //get the element clicked
+        const clickedEl = event.target;
+
+        //stop function if click happened outside btn
+        if(clickedEl.className === 'hashtags'){
+            return ;
+        }
+
+        //extract company name of the target el, then take away # and lowercase for comparison
+       const companyNameFromHashtag = clickedEl.textContent.substring(1).toLowerCase().trim();
+       console.log(companyNameFromHashtag);
+
+       //company name from feedback
+       feedback.childNodes.forEach(childNode => {
+            //stop if child has text node (empty text)
+            if(childNode.nodeType === 3) return;
+       
+            //extract company name
+            const companyNameFromFeedbackItem = childNode.querySelector('.feedback__company').textContent.toLowerCase().trim();
+            
+          
+          if(companyNameFromHashtag !== companyNameFromFeedbackItem){
+            childNode.remove();
+          }
+       });
+        
+    }
+
+    hashtagsListEl.addEventListener('click', clickHandlerHashtags);
+
 
